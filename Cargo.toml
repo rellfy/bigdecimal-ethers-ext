@@ -1,0 +1,15 @@
+[package]
+name = "bigdecimal-ethers-ext"
+authors = ["Lorenzo Fontoura <lorenzo@nioel.com>"]
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+homepage = "https://github.com/rellfy/bigdecimal-ethers-ext"
+repository = "https://github.com/rellfy/bigdecimal-ethers-ext"
+description = "Library allowing conversion between BigDecimal and ethers"
+readme = "README.md"
+
+[dependencies]
+bigdecimal = "0.4.1"
+ethers = "2.0.8"
+log = "0.4.19"
