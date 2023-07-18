@@ -6,4 +6,5 @@ fn main() {
     // Convert to an u256 with 18 decimals.
     let u256 = big_decimal.to_ethers_u256(18).unwrap();
     println!("{u256}");
+    // 10500000000000000000
 }
