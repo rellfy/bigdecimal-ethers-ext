@@ -1,9 +1,9 @@
 mod from_ethers;
 mod to_ethers;
+use crate::from_ethers::{from_ethers_i256, from_ethers_u256};
+use crate::to_ethers::{to_ethers_i256, to_ethers_u256};
 use bigdecimal::BigDecimal;
 use ethers::types::{I256, U256};
-pub use from_ethers::*;
-pub use to_ethers::*;
 
 pub trait BigDecimalEthersExt
 where
