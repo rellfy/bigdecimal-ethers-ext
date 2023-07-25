@@ -1,3 +1,4 @@
+use crate::BigDecimalEthersExt;
 use bigdecimal::num_bigint::Sign;
 use bigdecimal::BigDecimal;
 use ethers::prelude::*;
@@ -5,8 +6,6 @@ use ethers::types::{I256, U256};
 use log::error;
 use std::ops::{Add, Mul};
 use std::string::ToString;
-use bigdecimal::num_traits::real::Real;
-use crate::BigDecimalEthersExt;
 
 static MAX_I256: Lazy<U256> = Lazy::new(|| U256::from_dec_str(&I256::MAX.to_string()).unwrap());
 static MIN_I256_ABS: Lazy<U256> = Lazy::new(|| {
@@ -43,8 +42,8 @@ pub(crate) fn to_ethers_i256(bd: &BigDecimal, decimals: u8) -> Option<I256> {
     let Some(u256) = bd.abs().to_ethers_u256(decimals) else {
         return None;
     };
-    let would_overflow = sign == Sign::Plus && u256.gt(&MAX_I256)
-        || sign == Sign::Minus && u256.gt(&MIN_I256_ABS);
+    let would_overflow =
+        sign == Sign::Plus && u256.gt(&MAX_I256) || sign == Sign::Minus && u256.gt(&MIN_I256_ABS);
     if would_overflow {
         return None;
     }
@@ -68,8 +67,8 @@ fn split(bd: &BigDecimal) -> (String, String) {
 
 #[cfg(test)]
 mod test {
-    use bigdecimal::{BigDecimal, FromPrimitive};
     use crate::BigDecimalEthersExt;
+    use bigdecimal::{BigDecimal, FromPrimitive};
 
     #[test]
     fn should_convert_big_decimal_u8_to_ethers_u256_with_18_decimals() {
