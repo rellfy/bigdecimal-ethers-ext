@@ -22,10 +22,10 @@ impl BigDecimalEthersExt for BigDecimal {
     }
 
     fn from_ethers_u256(bn: U256, decimals: u8) -> Option<Self> {
-        todo!()
+        from_ethers_u256(bn, decimals)
     }
 
     fn from_ethers_i256(bn: I256, decimals: u8) -> Option<Self> {
-        todo!()
+        from_ethers_i256(bn, decimals)
     }
 }
