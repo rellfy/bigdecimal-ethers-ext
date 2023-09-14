@@ -1,6 +1,8 @@
 use bigdecimal::{BigDecimal, Num};
 use ethers::prelude::{I256, U256};
 
+const NEGATIVE_SIGN: &str = "-";
+
 pub(crate) fn from_ethers_u256(bn: &U256, decimals: u8) -> Option<BigDecimal> {
     to_big_decimal(bn.to_string(), decimals)
 }
@@ -9,19 +11,30 @@ pub(crate) fn from_ethers_i256(bn: &I256, decimals: u8) -> Option<BigDecimal> {
     to_big_decimal(bn.to_string(), decimals)
 }
 
-fn to_big_decimal(string: String, decimals: u8) -> Option<BigDecimal> {
+pub(crate) fn to_big_decimal(mut string: String, decimals: u8) -> Option<BigDecimal> {
     let decimals = decimals as usize;
     // e.g. for bn_str = "0", decimals = 1; must pad to "00" and return "0.0".
+    let negative_sign = parse_negative_sign(&mut string);
     let string = left_pad(string, decimals + 1, '0');
     let len = string.len();
     let decimal_start_index = len - decimals;
     let decimal_part = &string[decimal_start_index..];
     let integer_part = &string[..decimal_start_index];
-    let complete = format!("{integer_part}.{decimal_part}");
+    let complete = format!("{negative_sign}{integer_part}.{decimal_part}");
     let Ok(bd) = BigDecimal::from_str_radix(&complete, 10) else {
-        return None
+        return None;
     };
     Some(bd)
+}
+
+fn parse_negative_sign(string: &mut String) -> String {
+    let is_negative = string.starts_with('-');
+    if is_negative {
+        string.remove(0);
+        NEGATIVE_SIGN.to_owned()
+    } else {
+        String::new()
+    }
 }
 
 fn left_pad(string: String, length: usize, fill: char) -> String {
@@ -142,5 +155,29 @@ mod test {
         let bd = BigDecimal::from_ethers_i256(&i256, 1).unwrap();
         let bd_string = bd.to_string();
         assert_eq!(bd_string, "-100.5");
+    }
+
+    #[test]
+    fn should_convert_from_string_18_decimals_17_digits() {
+        let string = String::from("-12345678912345678");
+        let bd = BigDecimal::from_bn_string(string, 18).unwrap();
+        let bd_string = bd.to_string();
+        assert_eq!(bd_string, "-0.012345678912345678")
+    }
+
+    #[test]
+    fn should_convert_from_string_18_decimals_18_digits() {
+        let string = String::from("-123456789123456789");
+        let bd = BigDecimal::from_bn_string(string, 18).unwrap();
+        let bd_string = bd.to_string();
+        assert_eq!(bd_string, "-0.123456789123456789")
+    }
+
+    #[test]
+    fn should_convert_from_string_18_decimals_19_digits() {
+        let string = String::from("-1234567891234567891");
+        let bd = BigDecimal::from_bn_string(string, 18).unwrap();
+        let bd_string = bd.to_string();
+        assert_eq!(bd_string, "-1.234567891234567891")
     }
 }
